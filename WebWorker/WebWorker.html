@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<script>		
+			var worker;
+
+			function startWithoutWorker() {
+				var i = 10000;
+				
+				// Nichts geht mehr
+				while (true) {
+					document.getElementById('result').innerHTML = ++i;
+				}
+			}
+
+			/*
+				When executing scripts in an HTML page, the page becomes unresponsive until the script is finished.
+				A web worker is a JavaScript that runs in the background, independently of other scripts, without 
+				affecting the performance of the page. You can continue to do whatever you want: clicking, 
+				selecting things, etc., while the web worker runs in the background.
+				Quelle: https://www.w3schools.com/HTML/html5_webworkers.asp
+			*/
+			function startWithWorker() {
+				document.getElementById('result').innerHTML = 10000;
+				worker = new Worker("worker.js");
+				worker.postMessage(document.getElementById("result").innerHTML);
+
+				worker.onmessage = function(e)
+				{
+					document.getElementById("result").innerHTML = e.data;
+					worker.postMessage(document.getElementById("result").innerHTML);
+				}
+			}
+
+			function stopWorker() { 
+				worker.terminate();
+			}
+		</script>
+	</head>
+	<body>
+		<p>Zähler: <output id="result">10000</output></p>
+		<button onclick="startWithoutWorker()">Start without Worker</button> 
+		<button onclick="startWithWorker()">Start with Worker</button> 
+		<button onclick="stopWorker()">Stop Worker</button>
+	</body>
+</html>
+
